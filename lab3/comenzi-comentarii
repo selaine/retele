@@ -81,7 +81,7 @@ exit
 copy running-config startup-config
 <Enter>
 
-* Sa 
+* Sa salvam neaparat! (cu cat mai des, cu atat mai bine)
 <Enter>
 enable
 * Scriem parola: ciscoconpass
@@ -113,7 +113,7 @@ ping 192.168.100.1
 * subnet mask: 255.255.224.0
 * default gateway: 173.20.96.1
 
-* Copper Cross-Over(din CALC1(G 0) in SW1(G 0/0))
+* Copper Cross-Over(din CALC1(G 0) in SUA(G 0/0))
 
 * Ne conectam din Laptop(RS 232) la SUA(Console)
 
@@ -159,6 +159,9 @@ copy running-config startup-config
 * drag and drop HWIC-2T din dreapta jos a ferestrei pe
 * primul din dreapta dintre cele 4 WAN interface card slots.
 * power on
+* Comentariu: cand stii ca o sa ai Serial de la inceput, faci
+* acest upgrade inainte sa te apuci de configurare ca sa nu
+* pierzi ceva in caz ca uiti sa salvezi
 * }
 
 * Serial DTE(din CHINA(S0/0/0) in SUA(S0/0/0))
@@ -168,6 +171,7 @@ copy running-config startup-config
 enable
 configure terminal
 interface S0/0/0
+description Legatura CHINA-SUA
 ip address 10.10.10.49 255.255.255.252
 no shutdown
 exit
@@ -181,6 +185,7 @@ exit
 enable
 configure terminal
 interface S0/0/0
+description Legatura CHINA-SUA
 ip address 10.10.10.50 255.255.255.252
 no shutdown
 exit
