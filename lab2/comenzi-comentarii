@@ -6,7 +6,7 @@ Tutorial configurare Calculator-Switch-Router
 
 1. End devices -> Se plaseaza un PC denumit CALC1
 
-2. Opreste PC, schimba placa de retea cu -1CGE, porneste din nou PC
+2. Opreste PC, schimba placa de retea cu *-1CGE, porneste din nou PC
 
 3. Configurezi IP pe calculator
 * ip address: 192.168.10.10
@@ -16,7 +16,16 @@ Tutorial configurare Calculator-Switch-Router
 * Comentarii {
 * 192.168.0.0/16 - pentru ca este ip privat(din asta se poate determina NA, BA, RA)
 * Interval de ip(clasa A): 10.0.0.0/8
+
 * Interval de ip(clasa B): 172.16.0.0/12 <=> 172.31.255.255
+* Din adresa de retea 172.16.0.0/12 se pot calcula urmatoarele:
+* N.A.: 172.16.0.0/12
+* B.A.: 172.31.255.255/12
+* R.A.: 172.16.0.1 - 172.31.255.254/12
+* Deci putem spune ca 172.16.0.0/12 echivalent cu 172.16.0.0 - 172.31.255.255/12
+* Obs.: și 172.16.0.1 e de fapt 172.16.0.1/12
+* Obs. 2: când dai o adresă IP trebuie să dai și SM (subnet mask) pentru că altfel nu știi din ce rețea face parte adresa respectivă.
+
 * default gateway - cel mai mic ip din range(ie. adresele asign-abile, cum se pot "umple" biti liberi din subnet mask)
 * adresa de retea in cazul asta este 192.168.10.0/<24>subnet mask.
 * }
@@ -26,7 +35,8 @@ Tutorial configurare Calculator-Switch-Router
 5. Copper straight through(din CALC1(G 0) in SW1(G 0/1))
 
 * Se foloseste copper straight through cand se leaga device-uri de niveluri diferite(ex: sw - R)
-* Se foloseste cross over cand legi chestii de acelasi nivel(de ex: 2 switch, PC-PC, (! R- R), PC-R) - se reprezinta punctat.
+* Se foloseste cross over cand legi chestii de acelasi nivel(de ex: 2 switch, PC - PC, (! R - R), PC - R) - se reprezinta punctat.
+* Se foloseste cablu serial pentru R - R(cand avem WAN)
 
 6. End devices - Se plaseaza un Laptop(nu conteaza denumirea neaparat)
 
@@ -128,13 +138,14 @@ no
 enable
 configure terminal
 no ip domain-lookup
+hostname R
 service password-encryption
 
 security passwords min-length 10
 * se specifica lungimea minima a parolelor
 
 login block-for 20 attempts 2 within 30
-* blocheaza timp de 20 de secunde; la doua incercari gresite in interval de 20 de secunde
+* blocheaza timp de 20 de secunde; la doua incercari gresite in interval de 30 de secunde
 
 enable secret cisco12345
 enable password cisco54321
@@ -156,8 +167,9 @@ logging synchronous
 exec-timeout 15 0
 exit
 interface GigabitEthernet 0/0
-decription Legatura LAN 1
+description Legatura LAN 1
 ip address 192.168.10.1 255.255.255.0
+* sau in loc de 255.255.255.0, /24
 
 * Daca am gresit {
 * no ip address 192.168.10.1 255.255.255.0
@@ -180,4 +192,4 @@ ping 192.168.10.10
 * Ca sa ne conectam remote : telnet 192.168.10.1
 (cu parola de vty(ciscovtypass))
 enable
-* parola de cisco(cisco123545)
+* parola de cisco(cisco12345)

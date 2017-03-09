@@ -1,0 +1,194 @@
+* End devices -> Se plaseaza un PC denumit PC0
+
+* Opreste PC, schimba placa de retea cu *-1CGE, porneste din nou PC
+
+* Configurezi IP pe calculator:
+* ip address: 192.168.100.10
+* subnet mask: 255.255.255.192
+* default gateway: 192.168.100.1
+
+* Se plaseaza Switch 2960 denumit SW1
+
+* Copper straight through(din CALC1(G 0) in SW1(G 0/1))
+
+* End devices - Se plaseaza un Laptop(nu conteaza denumirea neaparat)
+
+* Se conecteaza cu cablu "Console" din Laptop(RS 232) in SW1(Console)
+
+* Se ruleaza din terminal(Laptop->Desktop->Terminal) urmatoarele comenzi:
+
+<Enter>
+enable
+configure terminal
+no ip domain-lookup
+hostname SW1
+service password-encryption
+enable secret cisco12345
+enable password cisco54321
+banner motd #Vineri la ora 02:00 serverul intra in mentenanta!#
+line console 0
+password ciscoconpass
+login
+logging synchronous
+exec-timeout 15 0
+exit
+line vty 0 15
+password ciscovtypass
+login
+logging synchronous
+exec-timeout 15 0
+exit
+interface range FastEthernet 0/1-24
+shutdown
+exit
+exit
+copy running-config startup-config
+<Enter>
+exit
+
+* Se plaseaza un router 2911 cu denumirea CHINA
+
+* Se leaga din SW1(G 0/2) -> CHINA(G 0/0)
+* Ne conectam din Laptop(RS 232) la CHINA(Console)
+
+* Rulam urmatoarele comenzi din terminalul Laptop-ului:
+
+no
+<Enter>
+enable
+configure terminal
+no ip domain-lookup
+hostname CHINA
+service password-encryption
+security passwords min-length 10
+login block-for 20 attempts 2 within 30
+enable secret cisco12345
+enable password cisco54321
+banner login #Accesul persoanelor neautorizate este strict interzis!#
+banner motd #Vineri, la ora 2:00, serverul intra in mentenanta!#
+line console 0
+password ciscoconpass
+login
+logging synchronous
+exec-timeout 15 0
+exit
+line vty 0 15
+password ciscovtypass
+login
+logging synchronous
+exec-timeout 15 0
+exit
+copy running-config startup-config
+<Enter>
+
+* Sa 
+<Enter>
+enable
+* Scriem parola: ciscoconpass
+configure terminal
+interface GigabitEthernet 0/0
+description Legatura LAN 1
+ip address 192.168.100.1 255.255.255.192
+* Daca am gresit {
+* no ip address 192.168.10.1 255.255.255.0
+* ip address <noul_ip> <noul_subnet_mask>
+* }
+no shutdown
+exit
+exit
+copy running-config startup-config
+
+
+* Ca sa testam conexiunea spre CHINA de pe PC0(calculator->desktop->command prompt):
+ping 192.168.100.1
+
+* Se plaseaza un router 2911 cu denumirea SUA
+
+* End devices -> Se plaseaza un PC denumit PC2
+
+* Opreste PC, schimba placa de retea cu *-1CGE, porneste din nou PC
+
+* Configurezi IP pe calculator:
+* ip address: 173.20.96.10
+* subnet mask: 255.255.224.0
+* default gateway: 173.20.96.1
+
+* Copper Cross-Over(din CALC1(G 0) in SW1(G 0/0))
+
+* Ne conectam din Laptop(RS 232) la SUA(Console)
+
+* Rulam urmatoarele comenzi din terminalul Laptop-ului:
+
+no
+<Enter>
+enable
+configure terminal
+no ip domain-lookup
+hostname SUA
+service password-encryption
+security passwords min-length 10
+login block-for 20 attempts 2 within 30
+enable secret cisco12345
+enable password cisco54321
+banner login #Accesul persoanelor neautorizate este strict interzis!#
+banner motd #Vineri, la ora 2:00, serverul intra in mentenanta!#
+line console 0
+password ciscoconpass
+login
+logging synchronous
+exec-timeout 15 0
+exit
+line vty 0 15
+password ciscovtypass
+login
+logging synchronous
+exec-timeout 15 0
+exit
+interface GigabitEthernet 0/0
+description Legatura LAN 1
+ip address 173.20.96.1 255.255.224.0
+no shutdown
+exit
+exit
+copy running-config startup-config
+<Enter>
+
+* Si pe CHINA si pe SUA se fac urmatoarele {
+* click router -> tab-ul physical
+* power off
+* drag and drop HWIC-2T din dreapta jos a ferestrei pe
+* primul din dreapta dintre cele 4 WAN interface card slots.
+* power on
+* }
+
+* Serial DTE(din CHINA(S0/0/0) in SUA(S0/0/0))
+
+* Ne conectam din Laptop(RS 232) la CHINA(Console)
+
+enable
+configure terminal
+interface S0/0/0
+ip address 10.10.10.49 255.255.255.252
+no shutdown
+exit
+exit
+copy running-config startup-config
+<Enter>
+exit
+
+* Ne conectam din Laptop(RS 232) la SUA(Console)
+
+enable
+configure terminal
+interface S0/0/0
+ip address 10.10.10.50 255.255.255.252
+no shutdown
+exit
+exit
+copy running-config startup-config
+<Enter>
+
+* Verificam conexiunea cu CHINA
+ping 10.10.10.49
+
+exit
