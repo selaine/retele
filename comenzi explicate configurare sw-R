@@ -1,0 +1,183 @@
+Tutorial configurare Calculator-Switch-Router
+
+0. Mediu de lucru pe tot ecranul
+
+0'. Nu mai mult de o fereastra pe langa cea principala
+
+1. End devices -> Se plaseaza un PC denumit CALC1
+
+2. Opreste PC, schimba placa de retea cu -1CGE, porneste din nou PC
+
+3. Configurezi IP pe calculator
+* ip address: 192.168.10.10
+* subnet mask: 255.255.255.0
+* default gateway: 192.168.10.1
+
+* Comentarii {
+* 192.168.0.0/16 - pentru ca este ip privat(din asta se poate determina NA, BA, RA)
+* Interval de ip(clasa A): 10.0.0.0/8
+* Interval de ip(clasa B): 172.16.0.0/12 <=> 172.31.255.255
+* default gateway - cel mai mic ip din range(ie. adresele asign-abile, cum se pot "umple" biti liberi din subnet mask)
+* adresa de retea in cazul asta este 192.168.10.0/<24>subnet mask.
+* }
+
+4. Se plaseaza Switch 2960 denumit SW1
+
+5. Copper straight through(din CALC1(G 0) in SW1(G 0/1))
+
+* Se foloseste copper straight through cand se leaga device-uri de niveluri diferite(ex: sw - R)
+* Se foloseste cross over cand legi chestii de acelasi nivel(de ex: 2 switch, PC-PC, (! R- R), PC-R) - se reprezinta punctat.
+
+6. End devices - Se plaseaza un Laptop(nu conteaza denumirea neaparat)
+
+7. Se conecteaza cu cablu "Console" din Laptop(RS 232) in SW1(Console)
+
+8. Se ruleaza din terminal(Laptop) urmatoarele comenzi:
+<Enter>
+* esti in modul user >
+enable
+* intra in modul privileged #
+
+configure terminal
+* intra in modul de configurare globala (config)#
+
+no ip domain-lookup
+* cand introduci ceva gresit, sa nu astepti degeaba
+
+hostname SW1
+* Sa stii despre ce echipament este vorba
+
+service password-encryption
+* cripteaza toate parolele (altfel sunt in text clar)
+
+enable secret cisco12345
+* o introduci cand dai enable
+
+enable password cisco54321
+* pe alea mai vechi nu exista secret; in caz ca nu merge secretu', ai ceva de backup; asta e criptata mai prost decat secret
+
+banner motd #Vineri la ora 02:00 serverul intra in mentenanta!#
+* message of the day
+
+line console 0
+* intra in modul de configurare linie pe consola (config-line)#
+
+password ciscoconpass
+* ti-o cere cand te conectezi direct cu cablu consola
+
+login
+* sa iti ceara parola
+
+logging synchronous
+* sa te intoarca unde ai ramas daca vin mesaje de la OS
+
+exec-timeout 15 0
+* te da afara dupa 15 minute si 0 secunde
+
+exit
+
+line vty 0 15
+* intra in configurarea liniilor vty (virtual terminal; telnet/ssh) de la 0 la 15
+
+password ciscovtypass
+login
+logging synchronous
+exec-timeout 15 0
+exit
+
+interface range FastEthernet 0/1-24
+* intra pe configurarea interfetelor 1-24 (config-if-range)#
+
+shutdown
+* inchidem tot ce nu folosim
+
+exit
+
+exit
+
+copy running-config startup-config
+
+* Cand apare "Destination filename [startup-config]?" -> <Enter>
+
+exit
+
+* Optional(ca sa vezi ca e securizat) {
+<Enter>
+* enable
+* (Iti cere secret-ul)
+* show running-config(iti arata hash-urile la parole si scorul de securitate + interfete + message of the day)
+* ....
+* }
+
+
+* Switch-ul - over
+
+* Incepem configurarea Router-ul copii!
+
+* Se plaseaza un router 2911 cu denumirea R
+
+* Se leaga din SW1(G 0/2) -> R(G 0/0)
+
+* Ne conectam din laptop la R(Console)
+
+no
+* Pentru ca by default o sa inceapa sa faca niste chestii pentru preconfigurare
+
+<Enter>
+
+enable
+configure terminal
+no ip domain-lookup
+service password-encryption
+
+security passwords min-length 10
+* se specifica lungimea minima a parolelor
+
+login block-for 20 attempts 2 within 30
+* blocheaza timp de 20 de secunde; la doua incercari gresite in interval de 20 de secunde
+
+enable secret cisco12345
+enable password cisco54321
+
+banner login #Accesul persoanelor neautorizate este strict interzis!#
+
+banner motd #Vineri, la ora 2:00, serverul intra in mentenanta!#
+
+line console 0
+password ciscoconpass
+login
+logging synchronous
+exec-timeout 15 0
+exit
+line vty 0 15
+password ciscovtypass
+login
+logging synchronous
+exec-timeout 15 0
+exit
+interface GigabitEthernet 0/0
+decription Legatura LAN 1
+ip address 192.168.10.1 255.255.255.0
+
+* Daca am gresit {
+* no ip address 192.168.10.1 255.255.255.0
+* ip address <noul_ip> <noul_subnet_mask>
+* }
+
+no shutdown
+* din rosu se face portocaliu si dupa verde
+
+exit
+exit
+copy running-config startup-config
+<Enter>
+
+* Ca sa testam conexiunea
+ping 192.168.10.10
+** sau cealalta modalitate
+* din calculator->desktop->command prompt-> C:\>ping 192.168.10.1
+
+* Ca sa ne conectam remote : telnet 192.168.10.1
+(cu parola de vty(ciscovtypass))
+enable
+* parola de cisco(cisco123545)
