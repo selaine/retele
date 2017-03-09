@@ -1,2 +1,2 @@
 # retele
-Notite, instructiuni din laboratorul de Retele.
+Notite, instructiuni si proiecte Packet Tracer din laboratorul de Retele.
