@@ -72,13 +72,13 @@ Adresa de rețea este ÎNTOTDEAUNA număr par!
 
 __7. Determinăm adresa de broadcast (în cursul profului de la curs sunt rețelele de difuzare)__
 
-__La NA adăugăm 2^(n+1) - 1, unde n = 32 - SM__
+__La NA adăugăm 2^n - 1, unde n = 32 - SM__
 
 Exemplu
 
 32-26=6
 
-2^(6+1) - 1 = 64 - 1 = 63 // 2^0 + 2^1 + ... + 2^n = 2^(n+1) - 1
+2^6 - 1 = 64 - 1 = 63 // 2^0 + 2^1 + ... + 2^(n-1) = 2^n - 1
 
 BA: 192.168.13.63
 
@@ -102,17 +102,17 @@ Avem NA: 172.16.64.0/18
 
 n = 32 - SM = 32 - 18 = 14
 
-Ca să nu calculăm 2^15, îl "spargem"
+Ca să nu calculăm 2^14, îl "spargem"
 
-2^8 - 1 se vor duce pe ultimul octet ( = 255; minus 1 din formula cu 2^(n+1)-1)
+2^8 - 1 se vor duce pe ultimul octet ( = 255; minus 1 din formula cu 2^n - 1)
 
-Rămânem cu 2^7 pentru al treilea octet
+Rămânem cu 2^6 pentru al treilea octet
 
-(De ce? Am zis că putem privi & IP ca pe un nr în baza 256. Atunci acel 2^7 va fi înmulțit cu (2^8)^1!
+(De ce? Am zis că putem privi & IP ca pe un nr în baza 256. Atunci acel 2^6 va fi înmulțit cu (2^8)^1!
 
 Ultimul octet este înmulțit cu 1 = (2^8)^0)
 
-64+64 = 128
+64+64 = 128 (primul 64 din octetul 3, al doilea 64 din 2^6)
 Am obținut BA: 172.16.128.255/18
 
 __8. Punem din nou totul cap la cap__
